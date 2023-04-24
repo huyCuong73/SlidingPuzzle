@@ -8,42 +8,44 @@ from time import time
 
 class Node(object):
 	
-	def __init__(self, parent, board, empty_pos, dimensions):
+	def __init__(self, parent, board, empty_pos, dimensions, h_function):
 		self.parent = parent
 		self.board = board
 		self.empty_pos = empty_pos
-		self.dimensions = dimensions
+		self.dimensions = dimensions                     
+		self.h_function = h_function
 		self.heuristic = self.calculate_heuristic()
 		self.possible_moves = self.calculate_possible_moves()
-		
-	# def calculate_heuristic(self):
-	# 	heuristic = 0
-	# 	for dim, val in self.board.items():
-	# 		if val is None: continue
-	# 		y = int((val-1)/dimensions)
-	# 		x = (val-1)%dimensions
-	# 		h = abs(x - dim[0]) + abs(y - dim[1])
-	# 		heuristic += h
-	# 	return heuristic
-	                                    
 
 	def calculate_heuristic(self):
-		# Initialize the heuristic value
-		heuristic = 0
-		# Loop through each row and column of the board
-		for i in range(self.dimensions):
-			# Find the tiles that are in their goal row or column
-			row_tiles = [self.board[(j, i)] for j in range(self.dimensions) if self.board[(j, i)] and (self.board[(j, i)] - 1) // self.dimensions == i]
-			col_tiles = [self.board[(i, j)] for j in range(self.dimensions) if self.board[(i, j)] and (self.board[(i, j)] - 1) % self.dimensions == i]
-			# Count the number of linear conflicts in each row or column
-			row_conflicts = count_conflicts(row_tiles)
-			col_conflicts = count_conflicts(col_tiles)
-			# Add the conflicts to the heuristic value
-			heuristic += row_conflicts + col_conflicts
-		# Add the Manhattan distance to the heuristic value
-		heuristic += calculate_manhattan(self.board)
-		# Return the heuristic value
-		return heuristic
+                
+		if(self.h_function == 1):
+	
+			heuristic = 0
+			for dim, val in self.board.items():
+				if val is None: continue
+				y = int((val-1)/self.dimensions)
+				x = (val-1)%self. dimensions
+				h = abs(x - dim[0]) + abs(y - dim[1])
+				heuristic += h
+			return heuristic
+                
+		if(self.h_function == 2):
+			heuristic = 0
+			# Loop through each row and column of the board
+			for i in range(self.dimensions):
+				# Find the tiles that are in their goal row or column
+				row_tiles = [self.board[(j, i)] for j in range(self.dimensions) if self.board[(j, i)] and (self.board[(j, i)] - 1) // self.dimensions == i]
+				col_tiles = [self.board[(i, j)] for j in range(self.dimensions) if self.board[(i, j)] and (self.board[(i, j)] - 1) % self.dimensions == i]
+				# Count the number of linear conflicts in each row or column
+				row_conflicts = count_conflicts(row_tiles)
+				col_conflicts = count_conflicts(col_tiles)
+				# Add the conflicts to the heuristic value
+				heuristic += row_conflicts + col_conflicts
+			# Add the Manhattan distance to the heuristic value
+			heuristic += calculate_manhattan(self.board)
+			# Return the heuristic value
+			return heuristic
 
 	def calculate_possible_moves(self):
 		p = self.empty_pos
@@ -60,7 +62,7 @@ class Node(object):
 			try:
 				new_board = copy(self.board)
 				new_board[self.empty_pos], new_board[move] = self.board[move], None
-				children.append(Node(self, new_board, move, self.dimensions))
+				children.append(Node(self, new_board, move, self.dimensions,self.h_function))
 			except KeyError: pass
 		return children
 	
@@ -167,17 +169,6 @@ def create_board(dimensions,board=None):
 	
 	return {(column, row): board.pop(0) for row in range(dimensions) for column in range(dimensions) if board}
 
-# def create_board(board=None):
-# 	global dimensions
-# 	solvable = lambda b: sum([sum([1 for i in range(n+1, len(b)) if b[n] > b[i]]) for n in range(0, len(b)-1)]) % 2 == 0
-# 	if board is None:
-# 		board = [i for i in range(1, dimensions**2)]
-# 		shuffle(board)
-# 		while not solvable(board): shuffle(board)
-# 	else:
-# 		if not solvable(board): return None
-# 	board.append(None)
-# 	return {(column, row): board.pop(0) for row in range(dimensions) for column in range(dimensions) if board}
                                            
 def get_solution(node):
 	solution = list()
@@ -204,16 +195,16 @@ def solve(board, bound, max_depth):
 	if n.heuristic == 0: return n,t
 	return solve(board, t, max_depth)
 
-def solvePuzzle(dimensions, custom_board):
-	
+def solvePuzzle(dimensions, custom_board , h_function):
     key = None
+    print("hfunction", h_function)
     board = create_board(dimensions,custom_board)  
     for k,v in board.items():
         if v == 0:
             key = k
             break      
     print(key)
-    root = Node(None, board, key, dimensions)   
+    root = Node(None, board, key, dimensions,h_function)   
     print("root:",root)
     print("Board:", board)
     print(root.__list__())                       
@@ -236,3 +227,5 @@ def solvePuzzle(dimensions, custom_board):
             "result": result,
             "time": end_time
         }
+
+solvePuzzle(4, [] , 1)

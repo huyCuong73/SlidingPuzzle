@@ -8,7 +8,7 @@ class Controller(Resource):
 
     def post(self):
         board = request.json
-        data = test.solvePuzzle(board["dimensions"], board["board"])
+        data = test.solvePuzzle(board["dimensions"], board["board"], board["h"])
         return jsonify(data)
         
 
