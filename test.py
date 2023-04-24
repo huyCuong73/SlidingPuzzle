@@ -20,7 +20,7 @@ class Node(object):
 	def calculate_heuristic(self):
                 
 		if(self.h_function == 1):
-	
+
 			heuristic = 0
 			for dim, val in self.board.items():
 				if val is None: continue
@@ -31,6 +31,7 @@ class Node(object):
 			return heuristic
                 
 		if(self.h_function == 2):
+
 			heuristic = 0
 			# Loop through each row and column of the board
 			for i in range(self.dimensions):
@@ -195,16 +196,18 @@ def solve(board, bound, max_depth):
 	if n.heuristic == 0: return n,t
 	return solve(board, t, max_depth)
 
-def solvePuzzle(dimensions, custom_board , h_function):
+def solvePuzzle(d, custom_board , h_function):
     key = None
-    print("hfunction", h_function)
+    print("hfunction", type(h_function))
+    h = int(h_function)
+    dimensions = int(d)
     board = create_board(dimensions,custom_board)  
     for k,v in board.items():
         if v == 0:
             key = k
             break      
     print(key)
-    root = Node(None, board, key, dimensions,h_function)   
+    root = Node(None, board, key, dimensions,h)   
     print("root:",root)
     print("Board:", board)
     print(root.__list__())                       
@@ -221,11 +224,19 @@ def solvePuzzle(dimensions, custom_board , h_function):
             result.append(node.__list__())
         print(result)
         print("\nSolved in %.4f seconds" % end_time)
+		
+        if(h==1):
+            return {
+	            "moves": moves,
+	            "result": result,
+				"mahattan_time": end_time
+			}
+        else:
+            return {
+	            "moves": moves,
+	            "result": result,
+				"linear_time": end_time
+			}           
+             
 
-        return {
-            "moves": moves,
-            "result": result,
-            "time": end_time
-        }
-
-solvePuzzle(4, [] , 1)
+solvePuzzle(3, [ 1, 2, 3, 0, 4 , 5, 6 , 7 , 8]  , 1)
